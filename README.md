@@ -6,10 +6,10 @@ CMakeLists.txt中我们对整个项目调用的库进行说明
 
 例如：我们从外部引入libeffect库，是一个动态库，在项目中的地址为${CMAKE_SOURCE_DIR}/libs/armeabi-v7a/libeffect.so。  
 
-add_library( libeffect
+        add_library( libeffect
         SHARED
         IMPORTED )
-set_target_properties( # Specifies the target library.
+        set_target_properties( # Specifies the target library.
         libeffect
         # Specifies the parameter you want to define.
         PROPERTIES IMPORTED_LOCATION
@@ -18,7 +18,7 @@ set_target_properties( # Specifies the target library.
         
 我们自己写的c++库：  
 
-add_library( # Sets the name of the library.
+        add_library( # Sets the name of the library.
         native-lib
 
         # Sets the library as a shared library.
@@ -29,15 +29,15 @@ add_library( # Sets the name of the library.
         src/main/cpp/TEUtils.cpp
         src/main/cpp/facedetect/FaceDetectHelper.cpp)
 
-include_directories(
+        include_directories(
         ${CMAKE_SOURCE_DIR}/src/main/cpp/include
         ${CMAKE_SOURCE_DIR}/src/main/cpp/include/libyuv
         ${CMAKE_SOURCE_DIR}/src/main/cpp/facedetect
-)  
+        )  
 
 我们自己写的native-lib会调用libyuv，libeffect
-target_link_libraries( # Specifies the target library.
-        native-lib
+        target_link_libraries( # Specifies the target library.
+         native-lib
 
         # Links the target library to the log library
         # included in the NDK.
