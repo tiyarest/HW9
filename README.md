@@ -96,8 +96,8 @@ CameraBufferManager来讲每一帧的数据加入一个队列里面，开启一�
 期间我们需要jni来讲分析请求，将byte转换成c++可以识别的数据，调用c++方法  
 
         extern "C"
-JNIEXPORT void JNICALL
-Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeDetectFace(JNIEnv *env,
+        JNIEXPORT void JNICALL
+        Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeDetectFace(JNIEnv *env,
                                                                              jobject instance,
                                                                              jbyteArray imageByteArr,
                                                                              jint pixelFormat,
@@ -142,8 +142,8 @@ Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeDetectFace(JNI
 通过mDetectFaceCallback回调给java，其中我们还需要jni进行一次转换  
 
         extern "C"
-JNIEXPORT void JNICALL
-Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeInit(JNIEnv *env,
+        JNIEXPORT void JNICALL
+        Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeInit(JNIEnv *env,
                                                                        jobject instance) {
 //    Android_JNI_GetEnv();
 
