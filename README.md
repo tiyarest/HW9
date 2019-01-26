@@ -191,7 +191,9 @@ Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeInit(JNIEnv *e
         }
     }
    
-   对回调的数据进行处理，添加框框
+   
+ 对回调的数据进行处理，添加框框：   
+ 
         FaceDetectHelper.getHelper().setFaceDetectedCallback(new FaceDetectHelper.OnFaceDetectedCallback() {
             @Override
             public void onFaceDetected(final int ret,final int left ,final int right ,final int bottom,final int top) {
@@ -201,20 +203,8 @@ Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeInit(JNIEnv *e
                         //TODO:
                         // 1 将人脸表情等通过ICON展示在UI上面
                         // 2 增加人脸位置返回值之后，通过方框的图在UI上面现实人脸区域
-//                        Canvas canvas = mSurfaceHolder.lockCanvas();
-//                        paint = new Paint();
-//                        paint.setColor(Color.BLUE);
-//                        paint.setStrokeWidth(2);
-//                        paint.setStyle(Paint.Style.STROKE);
-//                        canvas.drawRect(new RectF(100, 100, 200, 200), paint)
                         ImageView imageView = findViewById(R.id.face_box);
-                       // imageView.setHeight((int)((right-left)*1.5f));
-                        //imageView.setWidth((int)((bottom-top)*1.5f));
-
-
-                      //  LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams)imageView.getLayoutParams();
-
                         params.setMargins((int)(1080-bottom*1.5f),(int)(1920-right*1.5f),0,0);
                         params.height=(int)((right-left)*1.5f);
                         params.width=(int)((bottom-top)*1.5f);
