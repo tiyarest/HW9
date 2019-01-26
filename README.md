@@ -61,7 +61,7 @@ CMakeLists.txt中我们对整个项目调用的库进行说明
             }
         };
         
-CameraBufferManager来讲每一帧的数据加入一个buffer队列里面，开启一个新的线程来处理队列里面的buffer。新的线程开启检测。   
+CameraBufferManager来讲每一帧的数据加入一个队列里面，开启一个新的线程来处理队列里面的buffer。新的线程开启检测。   
 
         private Thread mThread = new Thread() {
         public void run() {
@@ -81,8 +81,77 @@ CameraBufferManager来讲每一帧的数据加入一个buffer队列里面，开�
         }
     };
 
+ 在detectFace（）里面，调用c++的的检测方法。
+ 
+        static {
+        System.loadLibrary("native-lib");
+    }
+    
+        public void detectFace(byte[] image, int pixelFormat, int width, int height, int stride) {
+        nativeDetectFace(image, pixelFormat, width, height, stride);
+    }
         
+        private native void nativeDetectFace(byte[] image, int pixelFormat, int width, int height, int stride);        
         
+期间我们需要jni来讲分析请求，将byte转换成c++可以识别的数据，调用c++方法  
+
+        extern "C"
+JNIEXPORT void JNICALL
+Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeDetectFace(JNIEnv *env,
+                                                                             jobject instance,
+                                                                             jbyteArray imageByteArr,
+                                                                             jint pixelFormat,
+                                                                             jint width,
+                                                                             jint height,
+                                                                             jint stride) {
+    jboolean copy = 1;
+    unsigned char *data = (unsigned char *) env->GetByteArrayElements(imageByteArr, &copy);
+
+    int length = width * height * 4;
+    unsigned char *rgbBuf = (unsigned char *) malloc(length);
+
+    libyuv::NV21ToARGB(data, width, data + width * height, width, rgbBuf, width * 4, width, height);
+
+    if (mFaceDetectHelper != NULL) {
+        mFaceDetectHelper->detectFace(rgbBuf, pixelFormat, width, height, stride);
+    }
+    free(rgbBuf);
+    env->ReleaseByteArrayElements(imageByteArr, (jbyte *) data, 0);
+
+}
+
+在detectFace（）函数中，如果检测成功  
+
+        if (result == BEF_RESULT_SUC) {
+        if (mDetectFaceCallback != NULL) {
+            LOGD("byted_effect_face_detect face count is %d", pFaceInfo.face_count);
+            if (pFaceInfo.face_count > 0) {
+                int len = sizeof(pFaceInfo.base_infos) / sizeof(pFaceInfo.base_infos[0]);
+                LOGD("byted_effect_face_detect face info size : %d", len);
+                for (int i = 0; i < len; ++i) {
+                    bef_face_106 item = pFaceInfo.base_infos[i];
+                    LOGD("byted_effect_face_detect face info action : %d - %d", i, item.action);
+                    if (item.action > 0) {
+                        //TODO: add face rect point
+                        mDetectFaceCallback(item.action,item.rect.left,item.rect.right,item.rect.bottom,item.rect.top);
+                    }
+                }
+            }
+        }
         
-        
-        
+通过mDetectFaceCallback回调
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
