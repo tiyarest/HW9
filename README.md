@@ -139,10 +139,92 @@ Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeDetectFace(JNI
             }
         }
         
-通过mDetectFaceCallback回调
+通过mDetectFaceCallback回调给java，其中我们还需要jni进行一次转换  
+
+        extern "C"
+JNIEXPORT void JNICALL
+Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeInit(JNIEnv *env,
+                                                                       jobject instance) {
+//    Android_JNI_GetEnv();
+
+    faceDetectHelperClass = env->GetObjectClass(instance);
+
+    if (faceDetectHelperClass != NULL) {
+        detectFaceCallbackMethod = env->GetStaticMethodID(faceDetectHelperClass,
+                                                          "nativeOnFaceDetectedCallback", "(IIIII)V");
+        if (detectFaceCallbackMethod == NULL) {
+            LOGE("detectFaceCallbackMethod NULL");
+        } else {
+            LOGE("detectFaceCallbackMethod success");
+        }
+    }
+
+    mObj = env->NewGlobalRef(faceDetectHelperClass);
+
+    if (mFaceDetectHelper == NULL) {
+        mFaceDetectHelper = new FaceDetectHelper();
+        mFaceDetectHelper->setDetectFaceCallback([](int ret,int l, int r, int t, int b) {
+            JNIEnv *_env = Android_JNI_GetEnv();
+            if (_env != NULL && detectFaceCallbackMethod && mObj != NULL) {
+                LOGD("jni detectFaceCallbackMethod ret : %d,%d,%d,%d,%d", ret,l,r,l,t,b);
+                _env->CallStaticVoidMethod((jclass) mObj, detectFaceCallbackMethod, ret,l,r,t,b);
+            }
+        });
+    }
+
+}
     
 
+回调给jave：  
 
+        public void onFaceDetectedCallback(int ret,int left ,int right ,int bottom,int top) {
+        if (mFaceDetectedCallback != null) {
+            mFaceDetectedCallback.onFaceDetected(ret,left,right,bottom,top);
+        }
+    }
+
+    //TODO: add fact rect points through the params in the callback
+    public static void nativeOnFaceDetectedCallback(int ret,int left ,int right ,int bottom,int top) {
+        Log.d("FaceDetectHelper", "JAVA detectFaceCallbackMethod ret : " + ret);
+        if (mHelper != null) {
+            mHelper.onFaceDetectedCallback(ret,left,right,bottom,top);
+        }
+    }
+   
+   对回调的数据进行处理，添加框框
+        FaceDetectHelper.getHelper().setFaceDetectedCallback(new FaceDetectHelper.OnFaceDetectedCallback() {
+            @Override
+            public void onFaceDetected(final int ret,final int left ,final int right ,final int bottom,final int top) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //TODO:
+                        // 1 将人脸表情等通过ICON展示在UI上面
+                        // 2 增加人脸位置返回值之后，通过方框的图在UI上面现实人脸区域
+//                        Canvas canvas = mSurfaceHolder.lockCanvas();
+//                        paint = new Paint();
+//                        paint.setColor(Color.BLUE);
+//                        paint.setStrokeWidth(2);
+//                        paint.setStyle(Paint.Style.STROKE);
+//                        canvas.drawRect(new RectF(100, 100, 200, 200), paint)
+                        ImageView imageView = findViewById(R.id.face_box);
+                       // imageView.setHeight((int)((right-left)*1.5f));
+                        //imageView.setWidth((int)((bottom-top)*1.5f));
+
+
+                      //  LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams)imageView.getLayoutParams();
+
+                        params.setMargins((int)(1080-bottom*1.5f),(int)(1920-right*1.5f),0,0);
+                        params.height=(int)((right-left)*1.5f);
+                        params.width=(int)((bottom-top)*1.5f);
+                        imageView.setLayoutParams(params);
+
+
+
+                       // tv.setText(left + "\n"+right+"\n"+top+"\n"+bottom);
+                    }
+                });
 
 
 
