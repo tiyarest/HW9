@@ -145,7 +145,6 @@ CameraBufferManager来讲每一帧的数据加入一个队列里面，开启一�
         JNIEXPORT void JNICALL
         Java_com_bytedance_ies_camerarecorddemoapp_FaceDetectHelper_nativeInit(JNIEnv *env,
                                                                        jobject instance) {
-//    Android_JNI_GetEnv();
 
     faceDetectHelperClass = env->GetObjectClass(instance);
 
