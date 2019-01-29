@@ -30,7 +30,11 @@
         android:layout_height="45dp"
         android:background="#e0FFF8DC"
         />
-
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="right|bottom"/>
     <Button
         android:id="@+id/write_bmp_btn"
         android:layout_width="wrap_content"
