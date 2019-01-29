@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
     private Button mCopyModeButton;
     private Button mWriteBMPButton;
     private Paint paint;
+    private ImageView icon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class MainActivity extends Activity {
         // Example of a call to a native method
         tv = (TextView) findViewById(R.id.sample_text);
         tv.setText("ooo");
+        icon = (ImageView) findViewById(R.id.icon);
 
         FaceDetectHelper.getHelper().setLicense("TvEbeOPnOCXa62ql1AgSpWADbsODeYUfAz5eo8P+KJPxmD42PeH+UDg1kweybbeXzb3Yj0IHcOtNXMkijk7uJ0n9QS4FnB4Kvp2iKnFDEJ+/wdqGfasiA/3vbvpSakJ79sZG/zt8pMESgPrmaBh59OoMZMpfwAFcibdc/b38KNU=");
         FaceDetectHelper.getHelper().setFaceDetectedCallback(new FaceDetectHelper.OnFaceDetectedCallback() {
@@ -90,6 +92,17 @@ public class MainActivity extends Activity {
                         params.height=(int)((right-left)*1.5f);
                         params.width=(int)((bottom-top)*1.5f);
                         imageView.setLayoutParams(params);
+
+                        icon.setVisibility(View.VISIBLE);
+                        switch(ret){
+                            case 2:icon.setImageResource(R.drawable.zhayan);break;
+                            case 4:icon.setImageResource(R.drawable.zhangzui);break;
+                            case 8:icon.setImageResource(R.drawable.yaotou);break;
+                            case 16:icon.setImageResource(R.drawable.diantou);break;
+                            case 32:icon.setImageResource(R.drawable.meimaotiaodong);break;
+                            case 64:icon.setImageResource(R.drawable.zuibadudu);break;
+                            default:icon.setVisibility(View.INVISIBLE);break;
+                        }
 
 
 
